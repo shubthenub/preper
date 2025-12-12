@@ -9,7 +9,7 @@ import { db } from "@/drizzle/db"
 import { and, eq } from "drizzle-orm"
 import { JobInfoTable } from "@/drizzle/schema"
 import { cacheTag } from "next/dist/server/use-cache/cache-tag"
-import { getJobInfoIdTag } from "./dbCache"
+import { getJobInfoIdTag } from "../dbCache"
 
 export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
   const { userId } = await getCurrentUser({allData: false})
