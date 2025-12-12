@@ -12,3 +12,8 @@ using docker for db setup
 define schema , user , jobInfo , question , interview tables 
 
 <!-- day 3 (start with clerk webhook setup) -->
+change of syntax noticed while using clerk webhook verify function vs manual svix setup 
+setting up the app page and navbar 
+setting up JobInfoForm 
+
+<!-- day 4 (start with revisiting and revising the JobInfoPage) -->
