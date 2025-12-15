@@ -28,4 +28,15 @@ new jobinfo page and edit jobInfo page done
 clerk theme setup + learn about css tailwind layers 
 
 <!-- day 5(start with clerk billing setup) -->
+clerk billing theme done 
+hume ai integration for ai chat 
+access token -> context provider -> access chat 
+
+<!-- day 6(start with interview page setup end to end) -->
+chat provider rendering in interviewpage 
+making sure interviews table in database is insync with the chat happening 
+update interview table with updatedInterview after every 5 seconds to simulate in sync 
+setup vercel ai and gemini ai usage 
+
+
 

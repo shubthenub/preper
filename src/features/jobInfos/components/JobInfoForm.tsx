@@ -23,10 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { jobInfoSchema } from "./schemas"
+import { jobInfoSchema } from "../schemas"
 import { formatExperienceLevel } from "../lib/formatters"
 import { LoadingSwap } from "@/components/ui/loading-swap"
-import { createJobInfo, updateJobInfo } from "./action"
+import { createJobInfo, updateJobInfo } from "../action"
 import { toast } from "sonner"
 
 type JobInfoFormData = z.infer<typeof jobInfoSchema>

@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import SignInPage from "./sign-in/[[...sign-in]]/page";
 import { SignInButton, UserButton } from "@clerk/nextjs";
+import { PricingTable } from "@/services/clerk/components/PricingTable";
 
 export default function HomePage() {
   return(
@@ -10,7 +11,9 @@ export default function HomePage() {
         <SignInButton/>
         <UserButton/>
         <ThemeToggle/>
+        
       </div>
+      <PricingTable/>
     </div>
       
     </>
