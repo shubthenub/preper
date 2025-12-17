@@ -38,5 +38,10 @@ making sure interviews table in database is insync with the chat happening
 update interview table with updatedInterview after every 5 seconds to simulate in sync 
 setup vercel ai and gemini ai usage 
 
+<!-- day 7(questions and resume page) -->
+both done , 
+faced problem in streaming data --> using manual encoding and data passing in chunks 
+
+
 
 
