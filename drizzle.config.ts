@@ -6,6 +6,6 @@ export default defineConfig({
   schema: "./src/drizzle/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: env.DATABASE_URL,
+    url: env.NEON_DB_URL || env.DATABASE_URL,
   },
 })

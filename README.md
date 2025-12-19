@@ -42,6 +42,9 @@ setup vercel ai and gemini ai usage
 both done , 
 faced problem in streaming data --> using manual encoding and data passing in chunks 
 
-
+<!-- day 8 -->
+Landing page 
+connected cloud db 
+vercel deployment 
 
 
