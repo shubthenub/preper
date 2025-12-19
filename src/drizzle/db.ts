@@ -5,6 +5,7 @@ import * as schema from "@/drizzle/schema";
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
 import { drizzle as drizzleNode } from "drizzle-orm/node-postgres";
 import { neon } from '@neondatabase/serverless';
+import { PgDatabase } from "drizzle-orm/pg-core";
 
 
 const createDb = () => {
@@ -18,4 +19,8 @@ const createDb = () => {
   return drizzleNode(env.DATABASE_URL, { schema });
 };
 
-export const db = createDb();
+//helper type to extract your schema relations
+type FullSchema = typeof schema;
+
+//Export the db with a simplified cast that doesn't conflict with internal HKTs
+export const db = createDb() as unknown as ReturnType<typeof drizzleNeon<FullSchema>>;
