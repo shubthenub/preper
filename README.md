@@ -1,141 +1,144 @@
 
 
-# 🚀 Preper: AI-Powered Interview Preparation
+# 🚀 Preper: AI-Powered Interview & Career Growth Platform
 
-**Preper** is a sophisticated, AI-driven platform designed to help candidates master their interview skills. By leveraging the power of **Hume AI** for realistic voice/chat interactions and **Google Gemini** for intelligent question generation, Preper provides a personalized and immersive preparation environment.
+**Preper** is a high-performance, full-stack platform designed to help candidates master technical and behavioral interviews. By combining **Hume AI’s** empathetic voice interface with **Google Gemini’s** reasoning, Preper provides a realistic, feedback-driven preparation ecosystem.
 
 ---
 
 ## 📑 Table of Contents
 
-1. [Project Overview](https://www.google.com/search?q=%23project-overview)
-2. [Key Features](https://www.google.com/search?q=%23key-features)
-3. [Tech Stack](https://www.google.com/search?q=%23tech-stack)
-4. [Application Workflow](https://www.google.com/search?q=%23application-workflow)
-5. [Prerequisites](https://www.google.com/search?q=%23prerequisites)
-6. [Installation](https://www.google.com/search?q=%23installation)
-7. [Environment Configuration](https://www.google.com/search?q=%23environment-configuration)
-8. [Database Setup](https://www.google.com/search?q=%23database-setup)
-9. [Development](https://www.google.com/search?q=%23development)
-10. [Deployment](https://www.google.com/search?q=%23deployment)
+* [Project Overview](#project-overview)
+* [Core Features](#core-features)
+* [Deep Dive: Features and Services](https://www.google.com/search?q=%23deep-dive-features-and-services)
+* [Tech Stack](https://www.google.com/search?q=%23tech-stack)
+* [Application Workflow](https://www.google.com/search?q=%23application-workflow)
+* [Packages and Dependencies](https://www.google.com/search?q=%23packages-and-dependencies)
+* [Installation and Setup](https://www.google.com/search?q=%23installation-and-setup)
+* [Database Configuration](https://www.google.com/search?q=%23database-configuration)
+* [Development](https://www.google.com/search?q=%23development)
+
+---
+<a id="project-overview"></a>
+## Project Overview
+
+Preper solves "interview anxiety" by providing an interactive environment that talks back. It moves beyond static question lists, offering real-time voice sessions, automated resume refining, and personalized practice modules tailored to specific job descriptions.
 
 ---
 
-## 📖 Project Overview
+<a id="core-features"></a>
+## Core Features
 
-Preper simulates real-world interview scenarios. It allows users to input specific job details, generates tailored technical and behavioral questions, and conducts interactive AI sessions. The application monitors and saves progress in real-time, providing a seamless experience from configuration to feedback.
-
----
-
-## ✨ Key Features
-
-* **🔐 Secure Authentication**: Integrated with Clerk for robust user management and custom-themed authentication flows.
-* **🎙️ AI Voice & Chat**: Powered by **Hume AI** for low-latency, emotionally expressive AI interactions.
-* **🧠 Intelligent Questioning**: Utilizes **Google Gemini (via Vercel AI SDK)** to generate context-aware interview questions based on job descriptions.
-* **💾 Real-time Syncing**: Automatically updates interview progress to a PostgreSQL database every 5 seconds to prevent data loss.
-* **🛡️ Advanced Security**: Built-in protection using **Arcjet** for rate limiting and bot detection.
-* **🌗 Modern UI/UX**: Responsive design with Tailwind CSS, supporting Dark/Light modes via `next-themes`.
-* **📊 Type-Safe Environment**: Strict environment variable validation using Zod for reliable deployments.
+* **🎙️ AI-Powered Mock Interviews**: Real-time voice/chat integration with **Hume AI** for low-latency, emotionally aware sessions.
+* **📄 Resume Refining (ATS Optimizer)**: Analyzes your resume against job descriptions to suggest keywords and structural improvements.
+* **📝 Question Practice Module**: Drills users on specific technical topics (React, DSA, System Design) with instant AI feedback.
+* **🧠 Intelligent Questioning**: Role-specific questions generated dynamically via **Google Gemini**.
+* **🛡️ Enterprise-Grade Security**: Protection against bot attacks and rate-limiting via **Arcjet**.
+* **💾 Real-time Persistence**: State-syncing every 5 seconds to ensure interview progress is never lost.
 
 ---
 
-## 🛠 Tech Stack
+## Deep Dive: Features and Services
 
-### Languages & Frameworks
+### 📂 Features Folder (`src/features`)
 
-* **Language**: [TypeScript](https://www.typescriptlang.org/) (95%+)
-* **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
-* **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-* **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
+Contains the core business modules of the application:
 
-### Backend & Infrastructure
+* **Interviews**: Manages the `JobInfoForm` and the live interview session UI. It coordinates the 5-second state-syncing logic to the database.
+* **Resume**: Handles file uploads and coordinates the parsing and analysis logic for ATS optimization.
+* **Practice**: Manages the library of AI-generated questions and the evaluation logic for user answers.
+* **Dashboard**: The central hub for users to track their interview history and performance metrics.
 
-* **Database**: [PostgreSQL](https://www.postgresql.org/)
-* **Auth**: [Clerk](https://clerk.dev/)
-* **Security**: [Arcjet](https://arcjet.com/)
-* **Containerization**: [Docker](https://www.docker.com/) (for local database)
+### 🛠️ Services Folder (`src/services`)
 
-### AI & SDKs
+Contains the infrastructure and external API integrations:
 
-* **AI Brain**: [Google Gemini AI](https://deepmind.google/technologies/gemini/)
-* **Voice/Chat Interface**: [Hume AI SDK](https://hume.ai/)
-* **Stream Handling**: [Vercel AI SDK](https://sdk.vercel.ai/)
+* **Gemini Service**: Handles prompt engineering for interviewers and resume analysts using the Vercel AI SDK.
+* **Hume Service**: Manages WebSocket connections and access tokens for real-time voice interaction.
+* **Arcjet Service**: Implements security layers including bot detection and AI-request rate limiting.
+* **DB Service**: The source of truth for the PostgreSQL schema (users, interviews, jobInfo) and the Drizzle client initialization.
 
 ---
 
-## 🔄 Application Workflow
+## Tech Stack
 
-Below is the high-level flow of how a user interacts with Preper:
+| Category | Technology |
+| --- | --- |
+| **Frontend** | Next.js 15 (App Router), TypeScript, Tailwind CSS, Shadcn/UI |
+| **Backend** | Next.js Server Actions, Node.js |
+| **Database** | PostgreSQL, Drizzle ORM |
+| **AI / ML** | Google Gemini (Gen AI), Hume AI (Voice/Streaming) |
+| **Security** | Clerk Auth, Arcjet Security |
+
+---
+
+## Application Workflow
 
 ```mermaid
 graph TD
-    A[User Visits Landing Page] --> B{Authenticated?}
-    B -- No --> C[Clerk Login/Sign-up]
-    B -- Yes --> D[User Dashboard]
+    User((User)) -->|Logs in| Clerk[Clerk Auth]
+    Clerk --> Dashboard[Dashboard]
     
-    D --> E[Job Information Form]
-    E -->|Input Role/Description| F[Gemini AI Question Generation]
+    Dashboard -->|Option 1| Interview[AI Mock Interview]
+    Dashboard -->|Option 2| Practice[Question Practice]
+    Dashboard -->|Option 3| Resume[Resume Refiner]
+
+    Interview -->|Job Info| Gemini[Google Gemini AI]
+    Gemini -->|Gen Questions| Hume[Hume AI SDK]
+    Hume -->|Voice/Chat Stream| User
     
-    F --> G[Interview Session Started]
-    G --> H[Hume AI Interface]
-    H -->|Voice/Chat Input| I[AI Real-time Response]
+    Interview -->|Auto-Sync| DB[(PostgreSQL + Drizzle)]
     
-    I --> J[Auto-Sync to DB]
-    J -->|Every 5 Seconds| K[(PostgreSQL Database)]
-    
-    G --> L[Session Completion]
-    L --> M[Feedback & Analysis]
+    Resume -->|Upload PDF| GeminiAnalysis[Gemini Analysis]
+    GeminiAnalysis -->|Suggestions| User
 
 ```
 
 ---
 
-## 📋 Prerequisites
+## Packages and Dependencies
 
-Before you begin, ensure you have the following installed:
-
-* **Node.js** (v18.x or later)
-* **Docker** & **Docker Compose**
-* **npm** or **pnpm** or **bun**
+* **UI Core**: `lucide-react`, `framer-motion`, `next-themes`, `shadcn/ui`.
+* **AI Integration**: `@google/generative-ai`, `@humeai/hume-sdk`, `ai` (Vercel AI SDK).
+* **Data & Auth**: `drizzle-orm`, `@clerk/nextjs`, `postgres`.
+* **Shield & Guard**: `@arcjet/next`.
+* **Utilities**: `zod` (Validation), `clsx`, `tailwind-merge`.
 
 ---
 
-## ⚙️ Installation
+## Installation and Setup
 
-1. **Clone the Repository**
+### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/shubthenub/preper.git
 cd preper
 
 ```
 
+### 2. Install Dependencies
 
-2. **Install Dependencies**
 ```bash
 npm install
 
 ```
 
+### 3. Environment Configuration
 
-
----
-
-## 🔑 Environment Configuration
-
-Create a `.env.local` file in the root directory and populate it with the following keys. Refer to `src/env.ts` (if applicable) for the required schema.
+Create a `.env.local` file:
 
 ```env
-# Clerk Authentication
+# Clerk
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 
-# Database Connection
+# Database
 DATABASE_URL=postgresql://user:password@localhost:5432/preper
 
-# AI Services
-GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key
-HUME_API_KEY=your_hume_api_key
-HUME_SECRET_KEY=your_hume_secret_key
+# AI APIs
+GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_key
+HUME_API_KEY=your_hume_key
+HUME_SECRET_KEY=your_hume_secret
 
 # Security
 ARCJET_KEY=aj_...
@@ -144,29 +147,25 @@ ARCJET_KEY=aj_...
 
 ---
 
-## 🗄️ Database Setup
+## Database Configuration
 
-The project uses **Docker** to spin up a local PostgreSQL instance and **Drizzle** to manage the schema.
+### 1. Start Postgres (Docker)
 
-1. **Start the Database**
 ```bash
 docker-compose up -d
 
 ```
 
+### 2. Sync Schema
 
-2. **Generate and Push Schema**
 ```bash
-npx drizzle-kit generate
 npx drizzle-kit push
 
 ```
 
-
-
 ---
 
-## 🚀 Development
+## Development
 
 Run the development server:
 
@@ -175,43 +174,10 @@ npm run dev
 
 ```
 
-Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) in your browser to see the application.
+Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) to view the application.
 
-### Key Scripts
-
-* `npm run dev`: Starts the Next.js dev server.
-* `npm run build`: Builds the application for production.
-* `npm run db:studio`: Opens the Drizzle Studio UI to visualize your data.
+* **Database Studio**: Use `npx drizzle-kit studio` to manage your data via a GUI.
 
 ---
 
-## 🚢 Deployment
-
-Preper is optimized for deployment on **Vercel**.
-
-1. Connect your GitHub repository to Vercel.
-2. Add the environment variables listed in `.env.local`.
-3. Ensure the Database URL points to a hosted PostgreSQL instance (e.g., Neon, Supabase, or AWS RDS).
-4. Deploy!
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📜 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-*Developed with ❤️ by [shubthenub](https://www.google.com/search?q=https://github.com/shubthenub).*
+**Would you like me to help you draft the specific system prompts for the Gemini Service to ensure the AI interviewer acts professionally?**
