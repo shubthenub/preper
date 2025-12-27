@@ -10,13 +10,13 @@
 
 * [Project Overview](#project-overview)
 * [Core Features](#core-features)
-* [Deep Dive: Features and Services](https://www.google.com/search?q=%23deep-dive-features-and-services)
-* [Tech Stack](https://www.google.com/search?q=%23tech-stack)
-* [Application Workflow](https://www.google.com/search?q=%23application-workflow)
-* [Packages and Dependencies](https://www.google.com/search?q=%23packages-and-dependencies)
-* [Installation and Setup](https://www.google.com/search?q=%23installation-and-setup)
-* [Database Configuration](https://www.google.com/search?q=%23database-configuration)
-* [Development](https://www.google.com/search?q=%23development)
+* [Deep Dive: Features and Services](#deep-dive-features-and-services)
+* [Tech Stack](#tech-stack)
+* [Application Workflow](#application-workflow)
+* [Packages and Dependencies](#packages-and-dependencies)
+* [Installation and Setup](#installation-and-setup)
+* [Database Configuration](#database-configuration)
+* [Development](#development)
 
 ---
 <a id="project-overview"></a>
@@ -38,6 +38,7 @@ Preper solves "interview anxiety" by providing an interactive environment that t
 
 ---
 
+<a id="deep-dive-features-and-services"></a>
 ## Deep Dive: Features and Services
 
 ### 📂 Features Folder (`src/features`)
@@ -60,6 +61,7 @@ Contains the infrastructure and external API integrations:
 
 ---
 
+<a id="tech-stack"></a>
 ## Tech Stack
 
 | Category | Technology |
@@ -72,6 +74,7 @@ Contains the infrastructure and external API integrations:
 
 ---
 
+<a id="application-workflow"></a>
 ## Application Workflow
 
 ```mermaid
@@ -96,6 +99,7 @@ graph TD
 
 ---
 
+<a id="packages-and-dependencies"></a>
 ## Packages and Dependencies
 
 * **UI Core**: `lucide-react`, `framer-motion`, `next-themes`, `shadcn/ui`.
@@ -106,6 +110,7 @@ graph TD
 
 ---
 
+<a id="installation-and-setup"></a>
 ## Installation and Setup
 
 ### 1. Clone the Repository
@@ -147,6 +152,7 @@ ARCJET_KEY=aj_...
 
 ---
 
+<a id="database-configuration"></a>
 ## Database Configuration
 
 ### 1. Start Postgres (Docker)
@@ -165,6 +171,7 @@ npx drizzle-kit push
 
 ---
 
+<a id="development"></a>
 ## Development
 
 Run the development server:
@@ -180,4 +187,4 @@ Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:30
 
 ---
 
-**Would you like me to help you draft the specific system prompts for the Gemini Service to ensure the AI interviewer acts professionally?**
+
