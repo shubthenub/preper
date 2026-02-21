@@ -1,6 +1,6 @@
 
 
-# 🚀 Preper: AI-Powered Interview & Career Growth Platform
+# Preper: AI-Powered Interview & Career Growth Platform
 
 **Preper** is a high-performance, full-stack platform designed to help candidates master technical and behavioral interviews. By combining **Hume AI’s** empathetic voice interface with **Google Gemini’s** reasoning, Preper provides a realistic, feedback-driven preparation ecosystem.
 
@@ -29,12 +29,12 @@ Preper solves "interview anxiety" by providing an interactive environment that t
 <a id="core-features"></a>
 ## Core Features
 
-* **🎙️ AI-Powered Mock Interviews**: Real-time voice/chat integration with **Hume AI** for low-latency, emotionally aware sessions.
-* **📄 Resume Refining (ATS Optimizer)**: Analyzes your resume against job descriptions to suggest keywords and structural improvements.
-* **📝 Question Practice Module**: Drills users on specific technical topics (React, DSA, System Design) with instant AI feedback.
-* **🧠 Intelligent Questioning**: Role-specific questions generated dynamically via **Google Gemini**.
-* **🛡️ Enterprise-Grade Security**: Protection against bot attacks and rate-limiting via **Arcjet**.
-* **💾 Real-time Persistence**: State-syncing every 5 seconds to ensure interview progress is never lost.
+* ** AI-Powered Mock Interviews**: Real-time voice/chat integration with **Hume AI** for low-latency, emotionally aware sessions.
+* ** Resume Refining (ATS Optimizer)**: Analyzes your resume against job descriptions to suggest keywords and structural improvements.
+* ** Question Practice Module**: Drills users on specific technical topics (React, DSA, System Design) with instant AI feedback.
+* ** Intelligent Questioning**: Role-specific questions generated dynamically via **Google Gemini**.
+* ** Enterprise-Grade Security**: Protection against bot attacks and rate-limiting via **Arcjet**.
+* ** Real-time Persistence**: State-syncing every 5 seconds to ensure interview progress is never lost.
 
 ---
 
