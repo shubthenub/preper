@@ -2,6 +2,8 @@ import { deleteUser, upsertUser } from "@/features/users/db"
 import { Webhook } from "svix"
 import { NextRequest } from "next/server"
 import { WebhookEvent } from "@clerk/nextjs/server"
+import { getUserIdTag } from "@/features/users/dbCache"
+import { revalidateTag } from "next/cache"
 
 //verifyWebhook needs CLERK_WEBHOOK_SIGNING_SECRET env variable set
 
@@ -57,6 +59,7 @@ export async function POST(request: NextRequest) {
           createdAt: new Date(clerkData.created_at),
           updatedAt: new Date(clerkData.updated_at),
         })
+        revalidateTag(getUserIdTag(clerkData.id))
         break
       }
       case "user.deleted": {
@@ -64,6 +67,7 @@ export async function POST(request: NextRequest) {
           return new Response("No user ID found", { status: 400 })
         }
         await deleteUser(event.data.id)
+        revalidateTag(getUserIdTag(event.data.id))
         break
       }
     }

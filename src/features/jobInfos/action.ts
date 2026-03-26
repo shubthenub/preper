@@ -9,7 +9,7 @@ import { db } from "@/drizzle/db"
 import { and, eq } from "drizzle-orm"
 import { JobInfoTable } from "@/drizzle/schema"
 import { cacheTag } from "next/dist/server/use-cache/cache-tag"
-import { getJobInfoIdTag } from "./dbCache"
+import { getJobInfoIdTag, revalidateJobInfoCache } from "./dbCache"
 
 export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
   const { userId } = await getCurrentUser({allData: false})
@@ -73,4 +73,28 @@ async function getJobInfo(id: string, userId: string) {
   return db.query.JobInfoTable.findFirst({
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
   })
+}
+
+export async function deleteJobInfo(id: string) {
+  const { userId } = await getCurrentUser({allData: false})
+  if (userId == null) {
+    return {
+      error: true,
+      message: "You don't have permission to do this",
+    }
+  }
+
+  const existingJobInfo = await getJobInfo(id, userId)
+  if (existingJobInfo == null) {
+    return {
+      error: true,
+      message: "Job not found",
+    }
+  }
+
+  await db.delete(JobInfoTable).where(eq(JobInfoTable.id, id))
+
+  revalidateJobInfoCache({ id, userId })
+
+  redirect(`/app/`)
 }

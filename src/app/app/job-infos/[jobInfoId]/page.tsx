@@ -2,6 +2,7 @@ import { BackLink } from "@/components/BackLink"
 import { Skeleton } from "@/components/Skeleton"
 import { SuspendedItem } from "@/components/SuspendedItem"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -11,11 +12,13 @@ import {
 } from "@/components/ui/card"
 import { db } from "@/drizzle/db"
 import { JobInfoTable } from "@/drizzle/schema"
+import { deleteJobInfo } from "@/features/jobInfos/action"
+import { DeleteJobInfoButton } from "@/features/jobInfos/components/DeleteJobInfoButton"
 import { getJobInfoIdTag } from "@/features/jobInfos/dbCache"
 import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters"
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { and, eq } from "drizzle-orm"
-import { ArrowRightIcon } from "lucide-react"
+import { ArrowRightIcon, TrashIcon } from "lucide-react"
 import { cacheTag } from "next/dist/server/use-cache/cache-tag"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -70,13 +73,17 @@ export default async function JobInfoPage({
       <div className="space-y-6">
         <header className="space-y-4">
           <div className="space-y-2">
-            <h1 className="text-3xl md:text-4xl">
-              <SuspendedItem
-                item={jobInfo}
-                fallback={<Skeleton className="w-48" />}
-                result={j => j.name}
-              />
-            </h1>
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl md:text-4xl">
+                <SuspendedItem
+                  item={jobInfo}
+                  fallback={<Skeleton className="w-48" />}
+                  result={j => j.name}
+                />
+              </h1>
+              <DeleteJobInfoButton id={jobInfoId} />
+            </div>
+
             <div className="flex gap-2">
               <SuspendedItem
                 item={jobInfo}
@@ -137,3 +144,4 @@ async function getJobInfo(id: string, userId: string) {
     where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
   })
 }
+

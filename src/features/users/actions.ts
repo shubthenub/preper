@@ -7,8 +7,8 @@ import { eq } from "drizzle-orm";
 import { UserTable } from "@/drizzle/schema";
 
 export async function getUser(userId: string) {
-    "use cache"
-    cacheTag(getUserIdTag(userId));
+    // "use cache"
+    // cacheTag(getUserIdTag(userId));
 
     return db.query.UserTable.findFirst({
         where: eq(UserTable.id, userId)

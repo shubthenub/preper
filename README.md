@@ -48,3 +48,9 @@ connected cloud db
 vercel deployment 
 
 
+
+TODOS-
+1. learn the whole streaming data architecture behind the scene 
+
+
+
