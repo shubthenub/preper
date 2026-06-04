@@ -17,6 +17,8 @@ import { and, asc, eq } from "drizzle-orm"
 import { cacheTag } from "next/dist/server/use-cache/cache-tag"
 import z from "zod"
 
+import { after } from "next/server"
+
 import { questionsAj } from "@/lib/arcjet"
 
 const schema = z.object({
@@ -59,14 +61,19 @@ export async function POST(req: Request) {
     jobInfo,
     previousQuestions,
     difficulty,
-    onFinish: async (text:string) => {
-      // DB save logic
+  })
+
+  after(async () => {
+    try {
+      const text = await aiResult.text
       await insertQuestion({
         id: questionId,
         text: text.trim(),
         jobInfoId,
         difficulty,
       })
+    } catch (e) {
+      console.error("Failed to save question in background after stream:", e)
     }
   })
 
