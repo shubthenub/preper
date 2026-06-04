@@ -8,11 +8,19 @@ import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { and, eq } from "drizzle-orm"
 import { cacheTag } from "next/dist/server/use-cache/cache-tag"
 
+import { resumesAj } from "@/lib/arcjet"
+
 export async function POST(req: Request) {
   const { userId } = await getCurrentUser({})
 
   if (userId == null) {
     return new Response("You are not logged in", { status: 401 })
+  }
+
+  // Rate Limiting
+  const decision = await resumesAj.protect(req, { userId, requested: 1 })
+  if (decision.isDenied()) {
+    return new Response("Too many requests. Please try again later.", { status: 429 })
   }
 
   const formData = await req.formData()

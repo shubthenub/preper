@@ -17,9 +17,34 @@ import { Suspense } from "react"
 import { UserAvatar } from "@/features/users/components/UserAvatar"
 import { PricingTable } from "@/services/clerk/components/PricingTable"
 
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Ace Your Next Interview with AI",
+  description: "Eliminate interview anxiety. Practice with our adaptive AI interviewer, optimize your resume for ATS systems, and solve technical coding questions.",
+}
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Preper",
+  "operatingSystem": "All",
+  "applicationCategory": "EducationalApplication",
+  "description": "AI-powered job and interview preparation platform offering mock interviews, resume feedback, and technical practice.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+
 export default function LandingPage() {
   return (
     <div className="bg-gradient-to-b from-background to-muted/20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       <Hero />
       <Features />

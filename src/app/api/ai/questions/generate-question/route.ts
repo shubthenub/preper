@@ -17,6 +17,8 @@ import { and, asc, eq } from "drizzle-orm"
 import { cacheTag } from "next/dist/server/use-cache/cache-tag"
 import z from "zod"
 
+import { questionsAj } from "@/lib/arcjet"
+
 const schema = z.object({
   prompt: z.enum(questionDifficulties),
   jobInfoId: z.string().min(1),
@@ -29,7 +31,23 @@ export async function POST(req: Request) {
 
   const { prompt: difficulty, jobInfoId } = result.data
   const { userId } = await getCurrentUser({})
-  const jobInfo = await getJobInfo(jobInfoId, userId!)
+  
+  if (userId == null) {
+    return new Response("You are not logged in", { status: 401 })
+  }
+
+  // Rate Limiting
+  const decision = await questionsAj.protect(req, { userId, requested: 1 })
+  if (decision.isDenied()) {
+    return new Response("Too many requests. Please try again later.", { status: 429 })
+  }
+
+  // Permission Check
+  if (!(await canCreateQuestion())) {
+    return new Response(PLAN_LIMIT_MESSAGE, { status: 403 })
+  }
+
+  const jobInfo = await getJobInfo(jobInfoId, userId)
   if (jobInfo == null) {
     return new Response("Job Info not found", { status: 404 })
   }

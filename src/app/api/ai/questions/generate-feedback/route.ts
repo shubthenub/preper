@@ -8,6 +8,8 @@ import { eq } from "drizzle-orm"
 import { cacheTag } from "next/dist/server/use-cache/cache-tag"
 import z from "zod"
 
+import { questionsAj } from "@/lib/arcjet"
+
 const schema = z.object({
   prompt: z.string().min(1),
   questionId: z.string().min(1),
@@ -26,6 +28,12 @@ export async function POST(req: Request) {
 
   if (userId == null) {
     return new Response("You are not logged in", { status: 401 })
+  }
+
+  // Rate Limiting
+  const decision = await questionsAj.protect(req, { userId, requested: 1 })
+  if (decision.isDenied()) {
+    return new Response("Too many requests. Please try again later.", { status: 429 })
   }
 
   const question = await getQuestion(questionId, userId)
