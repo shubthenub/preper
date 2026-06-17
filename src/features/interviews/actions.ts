@@ -1,7 +1,7 @@
 "use server"
 
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
+import { getCachedData } from "@/lib/redisCache"
 import { getJobInfoIdTag } from "../jobInfos/dbCache"
 import { db } from "@/drizzle/db"
 import { and, eq } from "drizzle-orm"
@@ -143,37 +143,44 @@ export async function generateInterviewFeedback(interviewId: string) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache"
-  cacheTag(getJobInfoIdTag(id))
-
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  })
+  return getCachedData(
+    `jobInfo:${id}:${userId}`,
+    [getJobInfoIdTag(id)],
+    () => db.query.JobInfoTable.findFirst({
+      where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
+    })
+  )
 }
 
 async function getInterview(id: string, userId: string) {
-  "use cache"
-  cacheTag(getInterviewIdTag(id))
-
-  const interview = await db.query.InterviewTable.findFirst({
-    where: eq(InterviewTable.id, id),
-    with: {
-      jobInfo: {
-        columns: {
-          id: true,
-          userId: true,
-          description: true,
-          title: true,
-          experienceLevel: true,
-        },
-      },
+  return getCachedData(
+    `interview:${id}:${userId}`,
+    (data) => {
+      if (data) {
+        return [getInterviewIdTag(id), getJobInfoIdTag(data.jobInfo.id)]
+      }
+      return [getInterviewIdTag(id)]
     },
-  })
+    async () => {
+      const interview = await db.query.InterviewTable.findFirst({
+        where: eq(InterviewTable.id, id),
+        with: {
+          jobInfo: {
+            columns: {
+              id: true,
+              userId: true,
+              description: true,
+              title: true,
+              experienceLevel: true,
+            },
+          },
+        },
+      })
 
-  if (interview == null) return null
+      if (interview == null) return null
+      if (interview.jobInfo.userId !== userId) return null
 
-  cacheTag(getJobInfoIdTag(interview.jobInfo.id))
-  if (interview.jobInfo.userId !== userId) return null
-
-  return interview
+      return interview
+    }
+  )
 }

@@ -1,5 +1,5 @@
 import { getGlobalTag, getIdTag } from "@/lib/dataCache"
-import { revalidateTag } from "next/cache"
+import { revalidateRedisTag } from "@/lib/redisCache"
 
 export function getUserGlobalTag() {
   return getGlobalTag("users")
@@ -10,6 +10,6 @@ export function getUserIdTag(id: string) {
 }
 
 export function revalidateUserCache(id: string) {
-  revalidateTag(getUserGlobalTag())
-  revalidateTag(getUserIdTag(id))
+  revalidateRedisTag(getUserGlobalTag())
+  revalidateRedisTag(getUserIdTag(id))
 }

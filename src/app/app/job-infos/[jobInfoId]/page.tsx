@@ -18,8 +18,8 @@ import { getJobInfoIdTag } from "@/features/jobInfos/dbCache"
 import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters"
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { and, eq } from "drizzle-orm"
-import { ArrowRightIcon, TrashIcon } from "lucide-react"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
+import { getCachedData } from "@/lib/redisCache"
+import { ArrowRightIcon } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
@@ -137,11 +137,12 @@ export default async function JobInfoPage({
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache"
-  cacheTag(getJobInfoIdTag(id))
-
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  })
+  return getCachedData(
+    `jobInfo:${id}:${userId}`,
+    [getJobInfoIdTag(id)],
+    () => db.query.JobInfoTable.findFirst({
+      where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
+    })
+  )
 }
 

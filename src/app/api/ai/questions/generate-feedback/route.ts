@@ -5,7 +5,7 @@ import { getQuestionIdTag } from "@/features/questions/dbCache"
 import { generateAiQuestionFeedback } from "@/services/ai/questions"
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { eq } from "drizzle-orm"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
+import { getCachedData } from "@/lib/redisCache"
 import z from "zod"
 
 import { questionsAj } from "@/lib/arcjet"
@@ -69,17 +69,23 @@ export async function POST(req: Request) {
 
 
 async function getQuestion(id: string, userId: string) {
-  "use cache"
-  cacheTag(getQuestionIdTag(id))
+  return getCachedData(
+    `question:${id}:${userId}`,
+    (data) => {
+      if (data) {
+        return [getQuestionIdTag(id), getJobInfoIdTag(data.jobInfo.id)]
+      }
+      return [getQuestionIdTag(id)]
+    },
+    async () => {
+      const question = await db.query.QuestionTable.findFirst({
+        where: eq(QuestionTable.id, id),
+        with: { jobInfo: { columns: { id: true, userId: true } } },
+      })
 
-  const question = await db.query.QuestionTable.findFirst({
-    where: eq(QuestionTable.id, id),
-    with: { jobInfo: { columns: { id: true, userId: true } } },
-  })
-
-  if (question == null) return null
-  cacheTag(getJobInfoIdTag(question.jobInfo.id))
-
-  if (question.jobInfo.userId !== userId) return null
-  return question
+      if (question == null) return null
+      if (question.jobInfo.userId !== userId) return null
+      return question
+    }
+  )
 }

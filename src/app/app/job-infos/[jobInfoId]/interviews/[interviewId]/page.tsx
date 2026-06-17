@@ -9,7 +9,7 @@ import { getJobInfoIdTag } from "@/features/jobInfos/dbCache"
 import { formatDateTime } from "@/lib/formatters"
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { eq } from "drizzle-orm"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
+import { getCachedData } from "@/lib/redisCache"
 import { notFound } from "next/navigation"
 import {
   Dialog,
@@ -125,25 +125,31 @@ async function Messages({
 }
 
 async function getInterview(id: string, userId: string) {
-  "use cache"
-  cacheTag(getInterviewIdTag(id))
-
-  const interview = await db.query.InterviewTable.findFirst({
-    where: eq(InterviewTable.id, id),
-    with: {
-      jobInfo: {
-        columns: {
-          id: true,
-          userId: true,
-        },
-      },
+  return getCachedData(
+    `interview:${id}:${userId}`,
+    (data) => {
+      if (data) {
+        return [getInterviewIdTag(id), getJobInfoIdTag(data.jobInfo.id)]
+      }
+      return [getInterviewIdTag(id)]
     },
-  })
+    async () => {
+      const interview = await db.query.InterviewTable.findFirst({
+        where: eq(InterviewTable.id, id),
+        with: {
+          jobInfo: {
+            columns: {
+              id: true,
+              userId: true,
+            },
+          },
+        },
+      })
 
-  if (interview == null) return null
+      if (interview == null) return null
+      if (interview.jobInfo.userId !== userId) return null
 
-  cacheTag(getJobInfoIdTag(interview.jobInfo.id))
-  if (interview.jobInfo.userId !== userId) return null
-
-  return interview
+      return interview
+    }
+  )
 }

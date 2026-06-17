@@ -6,7 +6,7 @@ import { PLAN_LIMIT_MESSAGE } from "@/lib/errorToast"
 import { analyzeResumeForJob } from "@/services/ai/resumes/ai"
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { and, eq } from "drizzle-orm"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
+import { getCachedData } from "@/lib/redisCache"
 
 import { resumesAj } from "@/lib/arcjet"
 
@@ -68,10 +68,11 @@ export async function POST(req: Request) {
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache"
-  cacheTag(getJobInfoIdTag(id))
-
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  })
+  return getCachedData(
+    `jobInfo:${id}:${userId}`,
+    [getJobInfoIdTag(id)],
+    () => db.query.JobInfoTable.findFirst({
+      where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
+    })
+  )
 }

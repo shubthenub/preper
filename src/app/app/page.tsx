@@ -15,7 +15,7 @@ import { formatExperienceLevel } from "@/features/jobInfos/lib/formatters"
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { desc, eq } from "drizzle-orm"
 import { ArrowRightIcon, Loader2Icon, PlusIcon, TrashIcon } from "lucide-react"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
+import { getCachedData } from "@/lib/redisCache"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
@@ -120,9 +120,11 @@ function NoJobInfos() {
 }
 
 async function getJobInfos(userId: string) {
-    "use cache"
-    cacheTag(getJobInfoUserTag(userId));
-    return db.query.JobInfoTable.findMany({
-        where: eq(JobInfoTable.userId, userId)
-    })
+    return getCachedData(
+        `jobInfos:${userId}`,
+        [getJobInfoUserTag(userId)],
+        () => db.query.JobInfoTable.findMany({
+            where: eq(JobInfoTable.userId, userId)
+        })
+    )
 }

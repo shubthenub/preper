@@ -1,5 +1,5 @@
 import { getGlobalTag, getIdTag, getJobInfoTag } from "@/lib/dataCache"
-import { revalidateTag } from "next/cache"
+import { revalidateRedisTag } from "@/lib/redisCache"
 
 export function getInterviewGlobalTag() {
   return getGlobalTag("interviews")
@@ -20,7 +20,7 @@ export function revalidateInterviewCache({
   id: string
   jobInfoId: string
 }) {
-  revalidateTag(getInterviewGlobalTag())
-  revalidateTag(getInterviewJobInfoTag(jobInfoId))
-  revalidateTag(getInterviewIdTag(id))
+  revalidateRedisTag(getInterviewGlobalTag())
+  revalidateRedisTag(getInterviewJobInfoTag(jobInfoId))
+  revalidateRedisTag(getInterviewIdTag(id))
 }

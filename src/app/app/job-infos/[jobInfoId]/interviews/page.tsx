@@ -15,7 +15,7 @@ import { formatDateTime } from "@/lib/formatters"
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { and, desc, eq, isNotNull } from "drizzle-orm"
 import { ArrowRightIcon, Loader2Icon, PlusIcon } from "lucide-react"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
+import { getCachedData } from "@/lib/redisCache"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
@@ -99,18 +99,20 @@ async function SuspendedPage({ jobInfoId }: { jobInfoId: string }) {
 }
 
 async function getInterviews(jobInfoId: string, userId: string) {
-  "use cache"
-  cacheTag(getInterviewJobInfoTag(jobInfoId))
-  cacheTag(getJobInfoIdTag(jobInfoId))
+  return getCachedData(
+    `interviews:${jobInfoId}:${userId}`,
+    [getInterviewJobInfoTag(jobInfoId), getJobInfoIdTag(jobInfoId)],
+    async () => {
+      const data = await db.query.InterviewTable.findMany({
+        where: and(
+          eq(InterviewTable.jobInfoId, jobInfoId),
+          isNotNull(InterviewTable.humeChatId)
+        ),
+        with: { jobInfo: { columns: { userId: true } } },
+        orderBy: desc(InterviewTable.updatedAt),
+      })
 
-  const data = await db.query.InterviewTable.findMany({
-    where: and(
-      eq(InterviewTable.jobInfoId, jobInfoId),
-      isNotNull(InterviewTable.humeChatId)
-    ),
-    with: { jobInfo: { columns: { userId: true } } },
-    orderBy: desc(InterviewTable.updatedAt),
-  })
-
-  return data.filter(interview => interview.jobInfo.userId === userId)
+      return data.filter(interview => interview.jobInfo.userId === userId)
+    }
+  )
 }

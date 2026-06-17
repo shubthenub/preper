@@ -8,8 +8,8 @@ import { redirect } from "next/navigation"
 import { db } from "@/drizzle/db"
 import { and, eq } from "drizzle-orm"
 import { JobInfoTable } from "@/drizzle/schema"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
 import { getJobInfoIdTag, revalidateJobInfoCache } from "./dbCache"
+import { getCachedData } from "@/lib/redisCache"
 
 export async function createJobInfo(unsafeData: z.infer<typeof jobInfoSchema>) {
   const { userId } = await getCurrentUser({allData: false})
@@ -67,12 +67,13 @@ export async function updateJobInfo(
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache"
-  cacheTag(getJobInfoIdTag(id))
-
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  })
+  return getCachedData(
+    `jobInfo:${id}:${userId}`,
+    [getJobInfoIdTag(id)],
+    () => db.query.JobInfoTable.findFirst({
+      where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
+    })
+  )
 }
 
 export async function deleteJobInfo(id: string) {

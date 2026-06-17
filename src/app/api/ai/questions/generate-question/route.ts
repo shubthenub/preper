@@ -14,7 +14,7 @@ import { getCurrentUser } from "@/services/clerk/lib/getCurrentUser"
 import { google } from "@/services/ai/models/google"
 import { streamText } from "ai"
 import { and, asc, eq } from "drizzle-orm"
-import { cacheTag } from "next/dist/server/use-cache/cache-tag"
+import { getCachedData } from "@/lib/redisCache"
 import z from "zod"
 
 
@@ -95,20 +95,22 @@ export async function POST(req: Request) {
 }
 
 async function getQuestions(jobInfoId: string) {
-  "use cache"
-  cacheTag(getQuestionJobInfoTag(jobInfoId))
-
-  return db.query.QuestionTable.findMany({
-    where: eq(QuestionTable.jobInfoId, jobInfoId),
-    orderBy: asc(QuestionTable.createdAt),
-  })
+  return getCachedData(
+    `questions:${jobInfoId}`,
+    [getQuestionJobInfoTag(jobInfoId)],
+    () => db.query.QuestionTable.findMany({
+      where: eq(QuestionTable.jobInfoId, jobInfoId),
+      orderBy: asc(QuestionTable.createdAt),
+    })
+  )
 }
 
 async function getJobInfo(id: string, userId: string) {
-  "use cache"
-  cacheTag(getJobInfoIdTag(id))
-
-  return db.query.JobInfoTable.findFirst({
-    where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
-  })
+  return getCachedData(
+    `jobInfo:${id}:${userId}`,
+    [getJobInfoIdTag(id)],
+    () => db.query.JobInfoTable.findFirst({
+      where: and(eq(JobInfoTable.id, id), eq(JobInfoTable.userId, userId)),
+    })
+  )
 }
