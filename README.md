@@ -59,9 +59,9 @@ Arcjet is applied at the server action level using a token bucket rule scoped pe
 
 A `ThemeProvider` from `next-themes` wraps the application body and supports system, light, and dark modes. The global stylesheet defines CSS variables for both themes and a custom `container` utility. Clerk's appearance object is configured inside a custom `ClerkProvider` to match the application's color tokens.
 
-### Server-Side Caching
+### Server-Side Caching (Stateless Redis Caching)
 
-Next.js 15's `"use cache"` directive is used in each feature's `db.ts`. Cache tags are constructed via helpers like `getJobInfoIdTag` and `getInterviewIdTag`, allowing targeted `revalidateTag` calls after mutations in server actions and webhook handlers.
+The application uses a stateless, global Redis cache (via the `redis` client) instead of local Next.js cache structures. Cached query functions wrap data fetching with `getCachedData` and tag-based invalidation is managed globally with `revalidateRedisTag`. This ensures all app instances are entirely stateless and can scale horizontally across multiple servers or regions.
 
 ---
 
@@ -183,6 +183,40 @@ All tables share `id` (UUID, `gen_random_uuid()`), `createdAt`, and `updatedAt` 
 
 ## Application Flow
 
+```mermaid
+graph TD
+    User([User]) -->|Clerk Auth| Clerk[Clerk Authentication]
+    Clerk -->|Webhook user.created| DB[(PostgreSQL DB)]
+    User -->|Create / Update| Job[Job Info]
+    
+    subgraph Technical Questions Flow
+        Job -->|Generate Question Request| GQ[generateAiQuestion]
+        GQ -->|Gemini Stream| GQ_Stream[Stream question text to client]
+        GQ_Stream -->|onFinish| GQ_Save[Save Question to DB]
+        User -->|Submit Answer| Feedback[generateAiQuestionFeedback]
+        Feedback -->|Read Question| Redis_Q[(Redis Cache)]
+        Redis_Q -->|Cache Miss| DB
+        Feedback -->|Gemini Stream Rating & Feedback| User
+    end
+
+    subgraph Mock Interview Flow
+        Job -->|Create Interview| Int[createInterview]
+        Int -->|Arcjet Rate Check| Arcjet[Arcjet Token Bucket]
+        Arcjet -->|Connect| Hume[Hume AI EVI WS]
+        Hume -->|Sync Chat ID every 5s| DB
+        Hume -->|Session ends| Int_Feedback[generateInterviewFeedback]
+        Int_Feedback -->|Fetch Chat History| Hume_API[Hume Chat API]
+        Int_Feedback -->|Grade Chat| Gemini[Gemini Interview Grader]
+        Gemini -->|Save Feedback| DB
+    end
+
+    subgraph Resume Analysis Flow
+        Job -->|Upload Resume PDF| Resume[analyzeResumeForJob]
+        Resume -->|Gemini Native File Input| Gemini_ATS[Gemini ATS Analysis]
+        Gemini_ATS -->|streamObject Zod Schema| Client_ATS[Stream Structured Scores & Categories]
+    end
+```
+
 ```
 User signs up via Clerk
   └── Clerk webhook (user.created)
@@ -190,7 +224,7 @@ User signs up via Clerk
 
 User creates a Job Info
   ├── Question Practice
-  │     generateAiQuestion (streamed) -> saved to DB on finish
+  │     generateAiQuestion (streamed) -> saved to DB on completion (onFinish)
   │     User submits answer -> generateAiQuestionFeedback (streamed)
   │
   ├── Mock Interview
@@ -220,9 +254,9 @@ User creates a Job Info
 
 `analyzeResumeForJob` uses `streamObject` with a Zod schema so the response is progressively parsed as it streams. The client can render each scored category as soon as its fields are available, without waiting for the full response.
 
-### Cache Architecture
+### Cache Architecture (Global Redis Cache)
 
-Each feature has a `dbCache.ts` defining tag constructors and a `db.ts` where query functions are marked `"use cache"` and tagged via `cacheTag()`. After any mutation, only the affected cache tags are invalidated using `revalidateTag()`. This avoids blanket path invalidation and keeps cached data as fresh as needed per record.
+Each feature has a `dbCache.ts` defining tag constructors. Data query functions wrap standard database fetching inside a global Redis cache helper `getCachedData()`. When cached, keys are associated with their cache tags inside a Redis Set. After any mutation, affected cache tags are invalidated globally using `revalidateRedisTag()`, which deletes all cache keys associated with that tag in Redis. This avoids blanket path invalidation and allows horizontal scaling across multiple application instances.
 
 ### Type-Safe Environment Variables
 
